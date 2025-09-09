@@ -1,0 +1,48 @@
+﻿@model EPCISEvent.MasterData.SupportingClasses.OutboundMapping
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>OutboundMapping</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CompanyId" class="control-label"></label>
+                <select asp-for="CompanyId" class ="form-control" asp-items="ViewBag.CompanyId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="FromBusinessId" class="control-label"></label>
+                <select asp-for="FromBusinessId" class ="form-control" asp-items="ViewBag.FromBusinessId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShipFromId" class="control-label"></label>
+                <select asp-for="ShipFromId" class ="form-control" asp-items="ViewBag.ShipFromId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ToBusinessId" class="control-label"></label>
+                <select asp-for="ToBusinessId" class ="form-control" asp-items="ViewBag.ToBusinessId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ShipToId" class="control-label"></label>
+                <select asp-for="ShipToId" class ="form-control" asp-items="ViewBag.ShipToId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

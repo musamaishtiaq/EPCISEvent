@@ -1,0 +1,179 @@
+﻿@model IEnumerable<EPCISEvent.MasterData.MainClasses.TradeItem>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.GTIN14)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NDC)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NdcPattern)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Company)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AdditionalId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AdditionalIdTypeCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DescriptionShort)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DosageFormType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FunctionalName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ManufacturerName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NetContentDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LabelDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RegulatedProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StrengthDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TradeItemDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SerialNumberLength)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PackCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CountryOfOrigin)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DrainedWeight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DrainedWeightUom)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GrossWeight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GrossWeightUom)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NetWeight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NetWeightUom)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PackageUom)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.GTIN14)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NDC)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NdcPattern)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Company.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdditionalId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AdditionalIdTypeCode)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DescriptionShort)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DosageFormType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FunctionalName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ManufacturerName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NetContentDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LabelDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegulatedProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StrengthDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TradeItemDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SerialNumberLength)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PackCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CountryOfOrigin)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DrainedWeight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DrainedWeightUom)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GrossWeight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GrossWeightUom)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NetWeight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NetWeightUom)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PackageUom)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

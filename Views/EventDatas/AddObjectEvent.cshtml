@@ -1,0 +1,301 @@
+﻿@model EPCISEvent.Models.ObjectEventViewModel
+
+@{
+    ViewData["Title"] = "Create Object Event";
+}
+
+<h1>Create Object Event</h1>
+
+<h4>Object Event</h4>
+<hr />
+
+<form asp-action="EditObjectEvent" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="EventType" class="control-label"></label>
+                <input readonly asp-for="EventType" class="form-control" />
+                <span asp-validation-for="EventType" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="EventTime" class="control-label"></label>
+                <input readonly asp-for="EventTime" class="form-control" />
+                <span asp-validation-for="EventTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="EventTimeZoneOffset" class="control-label"></label>
+                <input readonly asp-for="EventTimeZoneOffset" class="form-control" />
+                <span asp-validation-for="EventTimeZoneOffset" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="BizStep" class="control-label"></label>
+                <select asp-for="BizStep" asp-items="@EPCISEvent.Controllers.EventDatasController.GetBusinessStepSelectList()" class="form-control">
+                    <option value="">-- Select Business Step --</option>
+                </select>
+                <span asp-validation-for="BizStep" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Disposition" class="control-label"></label>
+                <select asp-for="Disposition" asp-items="@EPCISEvent.Controllers.EventDatasController.GetDispositionSelectList()" class="form-control">
+                    <option value="">-- Select Disposition --</option>
+                </select>
+                <span asp-validation-for="Disposition" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="BizLocationId" class="control-label"></label>
+                <select asp-for="BizLocationId" asp-items="ViewBag.Companies" class="form-control company-select"
+                        data-target-location="#ReadPointId">
+                    <option value="">-- Select Biz Location --</option>
+                </select>
+                @* <input asp-for="BizLocationId" class="form-control" /> *@
+                <span asp-validation-for="BizLocationId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ReadPointId" class="control-label"></label>
+                <select asp-for="ReadPointId" class="form-control location-select" id="ReadPointId">
+                    <option value="">-- Select Location --</option>
+                </select>
+                @* <input asp-for="ReadPointId" class="form-control" /> *@
+                <span asp-validation-for="ReadPointId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DestinationLocationId" class="control-label"></label>
+                <select asp-for="DestinationLocationId" asp-items="ViewBag.Companies" class="form-control company-select"
+                        data-target-location="#DestinationSubLocationId">
+                    <option value="">-- Select Destination --</option>
+                </select>
+                @* <input asp-for="DestinationLocationId" class="form-control" /> *@
+                <span asp-validation-for="DestinationLocationId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DestinationSubLocationId" class="control-label"></label>
+                <select asp-for="DestinationSubLocationId" class="form-control location-select" id="DestinationSubLocationId">
+                    <option value="">-- Select Location --</option>
+                </select>
+                @* <input asp-for="DestinationSubLocationId" class="form-control" /> *@
+                <span asp-validation-for="DestinationSubLocationId" class="text-danger"></span>
+            </div>
+                        
+            <div class="form-group">
+                <label asp-for="Action" class="control-label"></label>
+                <select asp-for="Action" asp-items="@EPCISEvent.Controllers.EventDatasController.GetActionSelectList()" class="form-control">
+                    <option value="">-- Select Action --</option>
+                </select>
+                <span asp-validation-for="Action" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- EPC List Section -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>EPC List</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="NewEpc" class="control-label">Add EPC</label>
+                <input name="NewEpc" class="form-control" />
+                <button type="button" class="btn btn-secondary mt-2" onclick="addEpc()">Add EPC</button>
+            </div>
+
+            <div id="epcList">
+                @for (int i = 0; i < Model.EpcList.Count; i++)
+                {
+                    <div class="epc-item">
+                        <input type="hidden" name="EpcList[@i]" value="@Model.EpcList[i]" />
+                        <span>@Model.EpcList[i]</span>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeEpc(this)">Remove</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Business Transactions Section -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Business Transactions</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="control-label">Transaction</label>
+                        <input name="NewBizTransaction" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="control-label">Type</label>
+                        @* <input name="NewBizTransactionType" class="form-control" /> *@
+                        <select asp-for="NewBizTransactionType" asp-items="@EPCISEvent.Controllers.EventDatasController.GetActionSelectList()" class="form-control">
+                            <option value="">-- Select Biz Transaction Type --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="control-label">&nbsp;</label>
+                        <button type="button" class="btn btn-secondary btn-block" onclick="addBizTransaction()">Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bizTransactionList">
+                @for (int i = 0; i < Model.BizTransactionList.Count; i++)
+                {
+                    <div class="biz-transaction-item">
+                        <input type="hidden" name="BizTransactionList[@i].BizTransaction" value="@Model.BizTransactionList[i].BizTransaction" />
+                        <input type="hidden" name="BizTransactionList[@i].Type" value="@Model.BizTransactionList[i].Type" />
+                        <span>@Model.BizTransactionList[i].BizTransaction (@Model.BizTransactionList[i].Type)</span>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeBizTransaction(this)">Remove</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group mt-4">
+        <input type="submit" value="Create" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Company change event for both business and destination sections
+            $('.company-select').change(function() {
+                var companySGLN = $(this).val();
+                var targetLocation = $(this).data('target-location');
+
+                if (companySGLN) {
+                    // Show loading in the target dropdown
+                    $(targetLocation).html('<option value="">Loading locations...</option>');
+
+                    // Get locations for selected company
+                    $.getJSON('@Url.Action("GetLocationsByCompany", "EventDatas")', { companySGLN: companySGLN })
+                        .done(function(data) {
+                            if (data.length > 0) {
+                                var options = '<option value="">-- Select Location --</option>';
+                                $.each(data, function() {
+                                    options += '<option value="' + this.sgln + '">' + this.identifier + '</option>';
+                                });
+                                $(targetLocation).html(options);
+                            } else {
+                                $(targetLocation).html('<option value="">No locations found</option>');
+                            }
+                        })
+                        .fail(function() {
+                            $(targetLocation).html('<option value="">Error loading locations</option>');
+                        });
+                } else {
+                    $(targetLocation).html('<option value="">-- Select Location --</option>');
+                }
+            });
+
+            // If editing existing data, trigger change events to populate dependent dropdowns
+            @if (!string.IsNullOrEmpty(Model.BizLocationId))
+            {
+                    <text>
+                    setTimeout(function() {
+                        $('#BizLocationCompanyId').trigger('change');
+                    }, 500);
+                    </text>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.DestinationLocationId))
+            {
+                    <text>
+                    setTimeout(function() {
+                        $('#DestinationCompanyId').trigger('change');
+                    }, 500);
+                    </text>
+            }
+
+            // Pre-select values if they exist (for edit scenarios)
+            @if (!string.IsNullOrEmpty(Model.ReadPointId))
+            {
+                    <text>
+                    setTimeout(function() {
+                        $('#ReadPointId').val('@Model.ReadPointId');
+                    }, 1000);
+                    </text>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.DestinationSubLocationId))
+            {
+                    <text>
+                    setTimeout(function() {
+                        $('#DestinationSubLocationId').val('@Model.DestinationSubLocationId');
+                    }, 1000);
+                    </text>
+            }
+        });
+
+        let epcIndex = @Model.EpcList.Count;
+        let bizTransactionIndex = @Model.BizTransactionList.Count;
+
+        function addEpc() {
+            const newEpc = document.querySelector('input[name="NewEpc"]').value;
+            if (newEpc) {
+                const div = document.createElement('div');
+                div.className = 'epc-item';
+                div.innerHTML = `
+                    <input type="hidden" name="EpcList[${epcIndex}]" value="${newEpc}" />
+                    <span>${newEpc}</span>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeEpc(this)">Remove</button>
+                `;
+                document.getElementById('epcList').appendChild(div);
+                document.querySelector('input[name="NewEpc"]').value = '';
+                epcIndex++;
+            }
+        }
+
+        function removeEpc(button) {
+            button.parentElement.remove();
+        }
+
+        function addBizTransaction() {
+            const bizTransaction = document.querySelector('input[name="NewBizTransaction"]').value;
+            const type = document.querySelector('input[name="NewBizTransactionType"]').value;
+
+            if (bizTransaction) {
+                const div = document.createElement('div');
+                div.className = 'biz-transaction-item';
+                div.innerHTML = `
+                    <input type="hidden" name="BizTransactionList[${bizTransactionIndex}].BizTransaction" value="${bizTransaction}" />
+                    <input type="hidden" name="BizTransactionList[${bizTransactionIndex}].Type" value="${type}" />
+                    <span>${bizTransaction} ${type ? '(' + type + ')' : ''}</span>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeBizTransaction(this)">Remove</button>
+                `;
+                document.getElementById('bizTransactionList').appendChild(div);
+                document.querySelector('input[name="NewBizTransaction"]').value = '';
+                document.querySelector('input[name="NewBizTransactionType"]').value = '';
+                bizTransactionIndex++;
+            }
+        }
+
+        function removeBizTransaction(button) {
+            button.parentElement.remove();
+        }
+    </script>
+}
