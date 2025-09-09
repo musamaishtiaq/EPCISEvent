@@ -111,34 +111,41 @@ namespace EPCISEvent.Controllers
                     {
                         destinations.Add(new Destination2
                         {
-                            Type = "urn:epcglobal:cbv:sdt:owning_party",
-                            Destination = model.DestinationLocationId,
+                            Type = SourceDestinationTypes.OwningParty.GetEnumMemberValue(),
+                            Destination = EPCISUtilities.Gln13ToSglnUrn(model.DestinationLocationId),
                         });
                     }
                     if (!string.IsNullOrEmpty(model.DestinationSubLocationId))
                     {
                         destinations.Add(new Destination2
                         {
-                            Type = "urn:epcglobal:cbv:sdt:location",
-                            Destination = model.DestinationSubLocationId,
+                            Type = SourceDestinationTypes.Location.GetEnumMemberValue(),
+                            Destination = EPCISUtilities.Gln13ToSglnUrn(model.DestinationSubLocationId),
                         });
                     }
+
                     var sources = new List<Source2>();
                     if (!string.IsNullOrEmpty(model.BizLocationId))
                     {
                         sources.Add(new Source2
                         {
-                            Type = "urn:epcglobal:cbv:sdt:possessing_party",
-                            Source = model.BizLocationId,
+                            Type = SourceDestinationTypes.PossessingParty.GetEnumMemberValue(),
+                            Source = EPCISUtilities.Gln13ToSglnUrn(model.BizLocationId),
                         });
                     }
                     if (!string.IsNullOrEmpty(model.ReadPointId))
                     {
                         sources.Add(new Source2
                         {
-                            Type = "urn:epcglobal:cbv:sdt:location",
-                            Source = model.ReadPointId,
+                            Type = SourceDestinationTypes.Location.GetEnumMemberValue(),
+                            Source = EPCISUtilities.Gln13ToSglnUrn(model.ReadPointId),
                         });
+                    }
+                    var bizTransactions = new List<BusinessTransaction>();
+                    foreach(var biz in model.BizTransactionList)
+                    {
+                        Enum.TryParse<BusinessTransactionType>(biz.Type, out var businessTransactionType);
+                        bizTransactions.Add(new BusinessTransaction(EPCISUtilities.BusinessTransactionToBtUrn(biz.BizTransaction), businessTransactionType.GetEnumMemberValue()));
                     }
 
                     // Convert view model to ObjectEvent2
@@ -149,13 +156,13 @@ namespace EPCISEvent.Controllers
                         EventTimeZoneOffset = model.EventTimeZoneOffset,
                         BizStep = model.BizStep.GetEnumMemberValue().Split(':').Last(),
                         Disposition = model.Disposition.GetEnumMemberValue().Split(':').Last(),
-                        ReadPoint = model.ReadPointId != null ? new IdWrapper { Id = model.ReadPointId } : null,
-                        BizLocation = model.BizLocationId != null ? new IdWrapper { Id = model.BizLocationId } : null,
+                        ReadPoint = model.ReadPointId != null ? new IdWrapper { Id = EPCISUtilities.Gln13ToSglnUrn(model.ReadPointId) } : null,
+                        BizLocation = model.BizLocationId != null ? new IdWrapper { Id = EPCISUtilities.Gln13ToSglnUrn(model.BizLocationId) } : null,
                         Action = model.Action.GetEnumMemberValue(),
                         EpcList = model.EpcList,
                         QuantityList = model.QuantityList,
                         Ilmd = model.Ilmd,
-                        BizTransactionList = model.BizTransactionList,
+                        BizTransactionList = bizTransactions,
                         SourceList = sources,
                         DestinationList = destinations
                     };

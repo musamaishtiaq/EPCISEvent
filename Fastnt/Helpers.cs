@@ -138,6 +138,18 @@ namespace EPCISEvent.Fastnt
             return $"urn:epc:id:sgln:{companyPrefix}.{locationReference}.{extension}";
         }
 
+        public static string Gln13ToSglnUrn(string gln)
+        {
+            if (gln.Length != 15)
+            {
+                throw new ArgumentException(
+                    "The company prefix and location reference variables " +
+                    "must total 12 digits in length when combined.");
+            }
+
+            return $"urn:epc:id:sgln:{gln}";
+        }
+
         //public static string GlnTypeToSdtUrn(string type)
         //{
         //    return $"urn:epcglobal:cbv:sdt:{type}";

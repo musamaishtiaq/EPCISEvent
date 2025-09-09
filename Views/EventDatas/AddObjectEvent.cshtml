@@ -142,7 +142,7 @@
                     <div class="form-group">
                         <label class="control-label">Type</label>
                         @* <input name="NewBizTransactionType" class="form-control" /> *@
-                        <select asp-for="NewBizTransactionType" asp-items="@EPCISEvent.Controllers.EventDatasController.GetActionSelectList()" class="form-control">
+                        <select asp-for="NewBizTransactionType" asp-items="@EPCISEvent.Controllers.EventDatasController.GetBusinessTransactionTypeList()" class="form-control">
                             <option value="">-- Select Biz Transaction Type --</option>
                         </select>
                     </div>
@@ -276,7 +276,9 @@
 
         function addBizTransaction() {
             const bizTransaction = document.querySelector('input[name="NewBizTransaction"]').value;
-            const type = document.querySelector('input[name="NewBizTransactionType"]').value;
+            const typeSelect = document.querySelector('select[name="NewBizTransactionType"]');
+            const type = typeSelect.value;
+            const typeText = typeSelect.options[typeSelect.selectedIndex].text;
 
             if (bizTransaction) {
                 const div = document.createElement('div');
@@ -284,12 +286,12 @@
                 div.innerHTML = `
                     <input type="hidden" name="BizTransactionList[${bizTransactionIndex}].BizTransaction" value="${bizTransaction}" />
                     <input type="hidden" name="BizTransactionList[${bizTransactionIndex}].Type" value="${type}" />
-                    <span>${bizTransaction} ${type ? '(' + type + ')' : ''}</span>
+                    <span>${bizTransaction} ${type ? '(' + typeText + ')' : ''}</span>
                     <button type="button" class="btn btn-sm btn-danger" onclick="removeBizTransaction(this)">Remove</button>
                 `;
                 document.getElementById('bizTransactionList').appendChild(div);
                 document.querySelector('input[name="NewBizTransaction"]').value = '';
-                document.querySelector('input[name="NewBizTransactionType"]').value = '';
+                typeSelect.selectedIndex = 0;
                 bizTransactionIndex++;
             }
         }

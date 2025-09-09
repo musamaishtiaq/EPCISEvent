@@ -46,6 +46,10 @@ namespace EPCISEvent.Fastnt
         public string BizTransaction { get; set; }
         public string Type { get; set; }
 
+        public BusinessTransaction()
+        {
+        }
+
         public BusinessTransaction(string bizTransaction, string type = null)
         {
             BizTransaction = bizTransaction;
