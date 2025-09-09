@@ -48,7 +48,7 @@ namespace EPCISEvent.Controllers
         // GET: LocationFields/Create
         public IActionResult Create()
         {
-            ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Id");
+            ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Name");
             return View();
         }
 
@@ -65,7 +65,7 @@ namespace EPCISEvent.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Id", locationField.LocationId);
+            ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Name", locationField.LocationId);
             return View(locationField);
         }
 
@@ -82,7 +82,7 @@ namespace EPCISEvent.Controllers
             {
                 return NotFound();
             }
-            ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Id", locationField.LocationId);
+            ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Name", locationField.LocationId);
             return View(locationField);
         }
 
@@ -118,7 +118,7 @@ namespace EPCISEvent.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Id", locationField.LocationId);
+            ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Name", locationField.LocationId);
             return View(locationField);
         }
 

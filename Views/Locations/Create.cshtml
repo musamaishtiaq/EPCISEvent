@@ -32,12 +32,18 @@
             </div>
             <div class="form-group">
                 <label asp-for="SST" class="control-label"></label>
-                <input asp-for="SST" class="form-control" />
+                @* <input asp-for="SST" class="form-control" /> *@
+                <select asp-for="SST" asp-items="@EPCISEvent.Controllers.LocationsController.GetSubSiteTypeList()" class="form-control">
+                    <option value="">-- Select Sub Site Type --</option>
+                </select>
                 <span asp-validation-for="SST" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="SSA" class="control-label"></label>
-                <input asp-for="SSA" class="form-control" />
+                @* <input asp-for="SSA" class="form-control" /> *@
+                <select asp-for="SSA" asp-items="@EPCISEvent.Controllers.LocationsController.GetSubSiteAttributesList()" class="form-control">
+                    <option value="">-- Select Sub Site Attribute --</option>
+                </select>
                 <span asp-validation-for="SSA" class="text-danger"></span>
             </div>
             <div class="form-group">

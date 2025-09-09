@@ -140,7 +140,7 @@ namespace EPCISEvent.Services
                     Country = "USA",
                     GLN13 = "0614141000001",
                     SGLN = "0614141.00001.1",
-                    SST = 1,
+                    SST = "1",
                     SSA = "A1"
                 },
                 new Location
@@ -155,7 +155,7 @@ namespace EPCISEvent.Services
                     Country = "USA",
                     GLN13 = "0087654000001",
                     SGLN = "0087654.00001.1",
-                    SST = 1,
+                    SST = "1",
                     SSA = "DC1"
                 },
                 new Location
@@ -171,7 +171,7 @@ namespace EPCISEvent.Services
                     Country = "USA",
                     GLN13 = "0087654000101",
                     SGLN = "0087654.00101.101",
-                    SST = 2,
+                    SST = "2",
                     SSA = "S101"
                 }
             };

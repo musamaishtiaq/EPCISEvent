@@ -52,11 +52,11 @@ namespace EPCISEvent.Controllers
         // GET: OutboundMappings/Create
         public IActionResult Create()
         {
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id");
-            ViewData["FromBusinessId"] = new SelectList(_context.Companies, "Id", "Id");
-            ViewData["ShipFromId"] = new SelectList(_context.Locations, "Id", "Id");
-            ViewData["ShipToId"] = new SelectList(_context.Locations, "Id", "Id");
-            ViewData["ToBusinessId"] = new SelectList(_context.Companies, "Id", "Id");
+            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name");
+            ViewData["FromBusinessId"] = new SelectList(_context.Companies, "Id", "Name");
+            ViewData["ShipFromId"] = new SelectList(_context.Locations, "Id", "Name");
+            ViewData["ShipToId"] = new SelectList(_context.Locations, "Id", "Name");
+            ViewData["ToBusinessId"] = new SelectList(_context.Companies, "Id", "Name");
             return View();
         }
 
@@ -73,11 +73,11 @@ namespace EPCISEvent.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", outboundMapping.CompanyId);
-            ViewData["FromBusinessId"] = new SelectList(_context.Companies, "Id", "Id", outboundMapping.FromBusinessId);
-            ViewData["ShipFromId"] = new SelectList(_context.Locations, "Id", "Id", outboundMapping.ShipFromId);
-            ViewData["ShipToId"] = new SelectList(_context.Locations, "Id", "Id", outboundMapping.ShipToId);
-            ViewData["ToBusinessId"] = new SelectList(_context.Companies, "Id", "Id", outboundMapping.ToBusinessId);
+            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", outboundMapping.CompanyId);
+            ViewData["FromBusinessId"] = new SelectList(_context.Companies, "Id", "Name", outboundMapping.FromBusinessId);
+            ViewData["ShipFromId"] = new SelectList(_context.Locations, "Id", "Name", outboundMapping.ShipFromId);
+            ViewData["ShipToId"] = new SelectList(_context.Locations, "Id", "Name", outboundMapping.ShipToId);
+            ViewData["ToBusinessId"] = new SelectList(_context.Companies, "Id", "Name", outboundMapping.ToBusinessId);
             return View(outboundMapping);
         }
 
@@ -94,11 +94,11 @@ namespace EPCISEvent.Controllers
             {
                 return NotFound();
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", outboundMapping.CompanyId);
-            ViewData["FromBusinessId"] = new SelectList(_context.Companies, "Id", "Id", outboundMapping.FromBusinessId);
-            ViewData["ShipFromId"] = new SelectList(_context.Locations, "Id", "Id", outboundMapping.ShipFromId);
-            ViewData["ShipToId"] = new SelectList(_context.Locations, "Id", "Id", outboundMapping.ShipToId);
-            ViewData["ToBusinessId"] = new SelectList(_context.Companies, "Id", "Id", outboundMapping.ToBusinessId);
+            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", outboundMapping.CompanyId);
+            ViewData["FromBusinessId"] = new SelectList(_context.Companies, "Id", "Name", outboundMapping.FromBusinessId);
+            ViewData["ShipFromId"] = new SelectList(_context.Locations, "Id", "Name", outboundMapping.ShipFromId);
+            ViewData["ShipToId"] = new SelectList(_context.Locations, "Id", "Name", outboundMapping.ShipToId);
+            ViewData["ToBusinessId"] = new SelectList(_context.Companies, "Id", "Name", outboundMapping.ToBusinessId);
             return View(outboundMapping);
         }
 
@@ -134,11 +134,11 @@ namespace EPCISEvent.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", outboundMapping.CompanyId);
-            ViewData["FromBusinessId"] = new SelectList(_context.Companies, "Id", "Id", outboundMapping.FromBusinessId);
-            ViewData["ShipFromId"] = new SelectList(_context.Locations, "Id", "Id", outboundMapping.ShipFromId);
-            ViewData["ShipToId"] = new SelectList(_context.Locations, "Id", "Id", outboundMapping.ShipToId);
-            ViewData["ToBusinessId"] = new SelectList(_context.Companies, "Id", "Id", outboundMapping.ToBusinessId);
+            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", outboundMapping.CompanyId);
+            ViewData["FromBusinessId"] = new SelectList(_context.Companies, "Id", "Name", outboundMapping.FromBusinessId);
+            ViewData["ShipFromId"] = new SelectList(_context.Locations, "Id", "Name", outboundMapping.ShipFromId);
+            ViewData["ShipToId"] = new SelectList(_context.Locations, "Id", "Name", outboundMapping.ShipToId);
+            ViewData["ToBusinessId"] = new SelectList(_context.Companies, "Id", "Name", outboundMapping.ToBusinessId);
             return View(outboundMapping);
         }
 

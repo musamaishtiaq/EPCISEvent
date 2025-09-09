@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EPCISEvent.Fastnt.CBV;
+using EPCISEvent.MasterData;
+using EPCISEvent.MasterData.MainClasses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EPCISEvent.MasterData;
-using EPCISEvent.MasterData.MainClasses;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EPCISEvent.Controllers
 {
@@ -45,6 +46,22 @@ namespace EPCISEvent.Controllers
             }
 
             return View(location);
+        }
+
+        public static SelectList GetSubSiteTypeList()
+        {
+            return new SelectList(Enum.GetValues(typeof(SubSiteTypeMasterDataAttribute))
+                .Cast<SubSiteTypeMasterDataAttribute>()
+                .Select(e => new { Value = e, Text = e.ToString() }),
+                "Value", "Text");
+        }
+
+        public static SelectList GetSubSiteAttributesList()
+        {
+            return new SelectList(Enum.GetValues(typeof(SubSiteAttributesMasterDataAttribute))
+                .Cast<SubSiteAttributesMasterDataAttribute>()
+                .Select(e => new { Value = e, Text = e.ToString() }),
+                "Value", "Text");
         }
 
         // GET: Locations/Create

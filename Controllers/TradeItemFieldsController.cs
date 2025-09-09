@@ -48,7 +48,7 @@ namespace EPCISEvent.Controllers
         // GET: TradeItemFields/Create
         public IActionResult Create()
         {
-            ViewData["TradeItemId"] = new SelectList(_context.TradeItems, "Id", "Id");
+            ViewData["TradeItemId"] = new SelectList(_context.TradeItems, "Id", "GTIN14");
             return View();
         }
 
@@ -65,7 +65,7 @@ namespace EPCISEvent.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TradeItemId"] = new SelectList(_context.TradeItems, "Id", "Id", tradeItemField.TradeItemId);
+            ViewData["TradeItemId"] = new SelectList(_context.TradeItems, "Id", "GTIN14", tradeItemField.TradeItemId);
             return View(tradeItemField);
         }
 
@@ -82,7 +82,7 @@ namespace EPCISEvent.Controllers
             {
                 return NotFound();
             }
-            ViewData["TradeItemId"] = new SelectList(_context.TradeItems, "Id", "Id", tradeItemField.TradeItemId);
+            ViewData["TradeItemId"] = new SelectList(_context.TradeItems, "Id", "GTIN14", tradeItemField.TradeItemId);
             return View(tradeItemField);
         }
 
@@ -118,7 +118,7 @@ namespace EPCISEvent.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["TradeItemId"] = new SelectList(_context.TradeItems, "Id", "Id", tradeItemField.TradeItemId);
+            ViewData["TradeItemId"] = new SelectList(_context.TradeItems, "Id", "GTIN14", tradeItemField.TradeItemId);
             return View(tradeItemField);
         }
 

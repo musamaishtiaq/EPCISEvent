@@ -22,7 +22,7 @@ namespace EPCISEvent.MasterData.MainClasses
         public int? LocationTypeId { get; set; }
         public LocationType LocationType { get; set; }
 
-        public short? SST { get; set; } // Sub-Site Type
+        public string SST { get; set; } // Sub-Site Type
         public string SSA { get; set; } // Sub-Site Attribute
 
         public ICollection<LocationField> Fields { get; set; }
