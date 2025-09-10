@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Action = EPCISEvent.Fastnt.Action;
 
@@ -98,6 +99,252 @@ namespace EPCISEvent.Controllers
             return View($"Add{eventData.EventType}", model);
         }
 
+        private List<Destination2> GetDestinationList(ObjectEventViewModel model)
+        {
+            var destinations = new List<Destination2>();
+            if (!string.IsNullOrEmpty(model.DestinationLocationId))
+            {
+                destinations.Add(new Destination2
+                {
+                    Type = SourceDestinationTypes.OwningParty.GetEnumMemberValue(),
+                    Destination = EPCISUtilities.Gln13ToSglnUrn(model.DestinationLocationId),
+                });
+            }
+            if (!string.IsNullOrEmpty(model.DestinationSubLocationId))
+            {
+                destinations.Add(new Destination2
+                {
+                    Type = SourceDestinationTypes.Location.GetEnumMemberValue(),
+                    Destination = EPCISUtilities.Gln13ToSglnUrn(model.DestinationSubLocationId),
+                });
+            }
+            return destinations;
+        }
+
+        private List<Source2> GetSourceList(ObjectEventViewModel model)
+        {
+            var sources = new List<Source2>();
+            if (!string.IsNullOrEmpty(model.BizLocationId))
+            {
+                sources.Add(new Source2
+                {
+                    Type = SourceDestinationTypes.PossessingParty.GetEnumMemberValue(),
+                    Source = EPCISUtilities.Gln13ToSglnUrn(model.BizLocationId),
+                });
+            }
+            if (!string.IsNullOrEmpty(model.ReadPointId))
+            {
+                sources.Add(new Source2
+                {
+                    Type = SourceDestinationTypes.Location.GetEnumMemberValue(),
+                    Source = EPCISUtilities.Gln13ToSglnUrn(model.ReadPointId),
+                });
+            }
+            return sources;
+        }
+
+        private List<BusinessTransaction> GetBusinessTransactionList(ObjectEventViewModel model)
+        {
+            var bizTransactions = new List<BusinessTransaction>();
+            foreach (var biz in model.BizTransactionList)
+            {
+                Enum.TryParse<BusinessTransactionType>(biz.Type, out var businessTransactionType);
+                bizTransactions.Add(new BusinessTransaction(EPCISUtilities.BusinessTransactionToBtUrn(biz.BizTransaction), businessTransactionType.GetEnumMemberValue()));
+            }
+            return bizTransactions;
+        }
+
+        private async Task<EPCISHeader> GenerateMasterDataAsync(ObjectEventViewModel model, List<BusinessTransaction> bizTransactions)
+        {
+            var dataList = new List<string>();
+
+            var masterData = new EPCISHeader
+            {
+                EpcisMasterData = new EPCISMasterData
+                {
+                    VocabularyList = new List<Vocabulary>()
+                }
+            };
+
+            // Add EPC Class vocabulary (products)
+            var epcVocabulary = new Vocabulary
+            {
+                Type = "urn:epcglobal:epcis:vtype:EPCClass",
+                VocabularyElementList = new List<VocabularyElement>()
+            };
+
+            foreach (var epc in model.EpcList)
+            {
+                var parts = epc.Split(':').Last().Split('.');
+                var gtin = $"{parts[0]}{parts[1]}";
+                if (!dataList.Contains(gtin))
+                {
+                    dataList.Add(gtin);
+                    var product = await _context.TradeItems.FirstOrDefaultAsync(ti => ti.GTIN14.StartsWith(gtin));
+                    epcVocabulary.VocabularyElementList.Add(new VocabularyElement
+                    {
+                        Id = epc,
+                        Attributes = new List<VocabularyAttribute>
+                    {
+                        new VocabularyAttribute { Id = "productName", Attribute = product.RegulatedProductName },
+                        new VocabularyAttribute { Id = "gtin", Attribute = product.GTIN14 },
+                        new VocabularyAttribute { Id = "brand", Attribute = product.ManufacturerName },
+                        new VocabularyAttribute { Id = "description", Attribute = product.DescriptionShort }
+                    }
+                    });
+                }
+            }
+
+            // Add Location vocabulary
+            var locationVocabulary = new Vocabulary
+            {
+                Type = "urn:epcglobal:epcis:vtype:Location",
+                VocabularyElementList = new List<VocabularyElement>()
+            };
+
+            // Add readPoint location
+            if (!string.IsNullOrEmpty(model.ReadPointId))
+            {
+                if (!dataList.Contains(model.ReadPointId))
+                {
+                    dataList.Add(model.ReadPointId);
+                    var readPoint = await _context.Locations.FirstOrDefaultAsync(l => l.SGLN == model.ReadPointId);
+                    locationVocabulary.VocabularyElementList.Add(new VocabularyElement
+                    {
+                        Id = EPCISUtilities.Gln13ToSglnUrn(model.ReadPointId),
+                        Attributes = new List<VocabularyAttribute>
+                    {
+                        new VocabularyAttribute { Id = "name", Attribute = readPoint.Name },
+                        new VocabularyAttribute { Id = "gln", Attribute = readPoint.GLN13 },
+                        new VocabularyAttribute { Id = "address", Attribute = readPoint.Address1 }
+                    }
+                    });
+                }
+            }
+
+            // Add bizLocation
+            if (!string.IsNullOrEmpty(model.BizLocationId))
+            {
+                if (!dataList.Contains(model.BizLocationId))
+                {
+                    dataList.Add(model.BizLocationId);
+                    var bizLocation = await _context.Companies.FirstOrDefaultAsync(c => c.SGLN == model.BizLocationId);
+                    locationVocabulary.VocabularyElementList.Add(new VocabularyElement
+                    {
+                        Id = EPCISUtilities.Gln13ToSglnUrn(model.BizLocationId),
+                        Attributes = new List<VocabularyAttribute>
+                        {
+                            new VocabularyAttribute { Id = "name", Attribute = bizLocation.Name },
+                            new VocabularyAttribute { Id = "gln", Attribute = bizLocation.GLN13 },
+                            new VocabularyAttribute { Id = "address", Attribute = bizLocation.Address1 }
+                        }
+                    });
+                }
+            }
+
+            // Add destination locations
+            if (!string.IsNullOrEmpty(model.DestinationLocationId))
+            {
+                if (!dataList.Contains(model.DestinationLocationId))
+                {
+                    dataList.Add(model.DestinationLocationId);
+                    var destLocation = await _context.Companies.FirstOrDefaultAsync(c => c.SGLN == model.DestinationLocationId);
+                    locationVocabulary.VocabularyElementList.Add(new VocabularyElement
+                    {
+                        Id = EPCISUtilities.Gln13ToSglnUrn(model.DestinationLocationId),
+                        Attributes = new List<VocabularyAttribute>
+                    {
+                        new VocabularyAttribute { Id = "name", Attribute = destLocation.Name },
+                        new VocabularyAttribute { Id = "gln", Attribute = destLocation.GLN13 },
+                        new VocabularyAttribute { Id = "address", Attribute = destLocation.Address1 }
+                    }
+                    });
+                }
+            }
+
+            if (!string.IsNullOrEmpty(model.DestinationSubLocationId))
+            {
+                if (!dataList.Contains(model.DestinationSubLocationId))
+                {
+                    dataList.Add(model.DestinationSubLocationId);
+                    var destSubLocation = await _context.Locations.FirstOrDefaultAsync(l => l.SGLN == model.DestinationSubLocationId);
+                    locationVocabulary.VocabularyElementList.Add(new VocabularyElement
+                    {
+                        Id = EPCISUtilities.Gln13ToSglnUrn(model.DestinationSubLocationId),
+                        Attributes = new List<VocabularyAttribute>
+                    {
+                        new VocabularyAttribute { Id = "name", Attribute = destSubLocation.Name },
+                        new VocabularyAttribute { Id = "gln", Attribute = destSubLocation.GLN13 },
+                        new VocabularyAttribute { Id = "address", Attribute = destSubLocation.Address1 }
+                    }
+                    });
+                }
+            }
+
+            // Add Business Transaction vocabulary
+            var bizTransVocabulary = new Vocabulary
+            {
+                Type = "urn:epcglobal:epcis:vtype:BusinessTransaction",
+                VocabularyElementList = new List<VocabularyElement>()
+            };
+
+            foreach (var bizTrans in bizTransactions)
+            {
+                //var bizTransDetails = _bizTransService.GetBusinessTransactionDetails(bizTrans.BizTransaction);
+                bizTransVocabulary.VocabularyElementList.Add(new VocabularyElement
+                {
+                    Id = bizTrans.BizTransaction,
+                    Attributes = new List<VocabularyAttribute>
+                    {
+                        new VocabularyAttribute { Id = "type", Attribute = bizTrans.Type },
+                        new VocabularyAttribute { Id = "documentDate", Attribute = DateTime.Now.ToString("yyyy-MM-dd") }
+                    }
+                });
+            }
+
+            //// Add Business Step and Disposition vocabularies
+            //var bizStepVocabulary = new Vocabulary
+            //{
+            //    Type = "urn:epcglobal:epcis:vtype:BusinessStep",
+            //    VocabularyElementList = new List<VocabularyElement>
+            //    {
+            //        new VocabularyElement
+            //        {
+            //            Id = model.BizStep.GetEnumMemberValue(),
+            //            Attributes = new List<VocabularyAttribute>
+            //            {
+            //                new VocabularyAttribute { Id = "description", Attribute = "Business step description" }
+            //            }
+            //        }
+            //    }
+            //};
+
+            //var dispositionVocabulary = new Vocabulary
+            //{
+            //    Type = "urn:epcglobal:epcis:vtype:Disposition",
+            //    VocabularyElementList = new List<VocabularyElement>
+            //    {
+            //        new VocabularyElement
+            //        {
+            //            Id = model.Disposition.GetEnumMemberValue(),
+            //            Attributes = new List<VocabularyAttribute>
+            //            {
+            //                new VocabularyAttribute { Id = "description", Attribute = "Disposition description" }
+            //            }
+            //        }
+            //    }
+            //};
+
+            // Add all vocabularies to master data
+            masterData.EpcisMasterData.VocabularyList.Add(epcVocabulary);
+            masterData.EpcisMasterData.VocabularyList.Add(locationVocabulary);
+            masterData.EpcisMasterData.VocabularyList.Add(bizTransVocabulary);
+            //masterData.EpcisMasterData.VocabularyList.Add(bizStepVocabulary);
+            //masterData.EpcisMasterData.VocabularyList.Add(dispositionVocabulary);
+
+            return masterData;
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditObjectEvent(int id, ObjectEventViewModel model)
@@ -106,47 +353,12 @@ namespace EPCISEvent.Controllers
             {
                 try
                 {
-                    var destinations = new List<Destination2>();
-                    if (!string.IsNullOrEmpty(model.DestinationLocationId))
-                    {
-                        destinations.Add(new Destination2
-                        {
-                            Type = SourceDestinationTypes.OwningParty.GetEnumMemberValue(),
-                            Destination = EPCISUtilities.Gln13ToSglnUrn(model.DestinationLocationId),
-                        });
-                    }
-                    if (!string.IsNullOrEmpty(model.DestinationSubLocationId))
-                    {
-                        destinations.Add(new Destination2
-                        {
-                            Type = SourceDestinationTypes.Location.GetEnumMemberValue(),
-                            Destination = EPCISUtilities.Gln13ToSglnUrn(model.DestinationSubLocationId),
-                        });
-                    }
+                    var destinations = GetDestinationList(model);
+                    var sources = GetSourceList(model);
+                    var bizTransactions = GetBusinessTransactionList(model);
 
-                    var sources = new List<Source2>();
-                    if (!string.IsNullOrEmpty(model.BizLocationId))
-                    {
-                        sources.Add(new Source2
-                        {
-                            Type = SourceDestinationTypes.PossessingParty.GetEnumMemberValue(),
-                            Source = EPCISUtilities.Gln13ToSglnUrn(model.BizLocationId),
-                        });
-                    }
-                    if (!string.IsNullOrEmpty(model.ReadPointId))
-                    {
-                        sources.Add(new Source2
-                        {
-                            Type = SourceDestinationTypes.Location.GetEnumMemberValue(),
-                            Source = EPCISUtilities.Gln13ToSglnUrn(model.ReadPointId),
-                        });
-                    }
-                    var bizTransactions = new List<BusinessTransaction>();
-                    foreach(var biz in model.BizTransactionList)
-                    {
-                        Enum.TryParse<BusinessTransactionType>(biz.Type, out var businessTransactionType);
-                        bizTransactions.Add(new BusinessTransaction(EPCISUtilities.BusinessTransactionToBtUrn(biz.BizTransaction), businessTransactionType.GetEnumMemberValue()));
-                    }
+                    // Generate master data
+                    var masterData = await GenerateMasterDataAsync(model, bizTransactions);
 
                     // Convert view model to ObjectEvent2
                     var objectEvent = new ObjectEvent2
@@ -167,8 +379,35 @@ namespace EPCISEvent.Controllers
                         DestinationList = destinations
                     };
 
-                    // Here you would typically save the event to your database or send it to a service
-                    // For now, we'll just redirect to a success page
+                    // Create complete EPCIS document
+                    var epcisDocument = new EPCISDocument2
+                    {
+                        Type = "EPCISDocument",
+                        SchemaVersion = "2.0",
+                        CreationDate = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+                        EpcisHeader = masterData,
+                        EpcisBody = new EPCISBody
+                        {
+                            EventList = new List<EPCISEvent2> { objectEvent }
+                        },
+                        Context = new List<object>
+                        {
+                            "https://ref.gs1.org/standards/epcis/2.0.0/epcis-context.jsonld",
+                            {
+                                new
+                                {
+                                    example = "http://ns.example.com/epcis/",
+                                    epcis = "urn:epcglobal:epcis:",
+                                    cbv = "urn:epcglobal:cbv:"
+                                }
+                            }
+                        }
+                    };
+
+                    // Serialize and process the document
+                    var encoder = new JsonEncoder();
+                    var json = encoder.Encode(epcisDocument);
+
                     ViewBag.Companies = GetCompanyList();
                     return View($"Add{model.EventType}", model);
                 }

@@ -48,7 +48,7 @@ namespace EPCISEvent.Controllers
         // GET: TradeItems/Create
         public IActionResult Create()
         {
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id");
+            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name");
             return View();
         }
 
@@ -65,7 +65,7 @@ namespace EPCISEvent.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", tradeItem.CompanyId);
+            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", tradeItem.CompanyId);
             return View(tradeItem);
         }
 
@@ -82,7 +82,7 @@ namespace EPCISEvent.Controllers
             {
                 return NotFound();
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", tradeItem.CompanyId);
+            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", tradeItem.CompanyId);
             return View(tradeItem);
         }
 
@@ -118,7 +118,7 @@ namespace EPCISEvent.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Id", tradeItem.CompanyId);
+            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", tradeItem.CompanyId);
             return View(tradeItem);
         }
 

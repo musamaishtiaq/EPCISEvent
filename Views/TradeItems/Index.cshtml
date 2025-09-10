@@ -24,39 +24,39 @@
             <th>
                 @Html.DisplayNameFor(model => model.Company)
             </th>
-            <th>
+            @* <th>
                 @Html.DisplayNameFor(model => model.AdditionalId)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.AdditionalIdTypeCode)
-            </th>
+            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.DescriptionShort)
             </th>
-            <th>
+            @* <th>
                 @Html.DisplayNameFor(model => model.DosageFormType)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.FunctionalName)
-            </th>
+            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.ManufacturerName)
             </th>
-            <th>
+            @* <th>
                 @Html.DisplayNameFor(model => model.NetContentDescription)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.LabelDescription)
-            </th>
+            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.RegulatedProductName)
             </th>
-            <th>
+            @* <th>
                 @Html.DisplayNameFor(model => model.StrengthDescription)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.TradeItemDescription)
-            </th>
+            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.SerialNumberLength)
             </th>
@@ -66,7 +66,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.CountryOfOrigin)
             </th>
-            <th>
+            @* <th>
                 @Html.DisplayNameFor(model => model.DrainedWeight)
             </th>
             <th>
@@ -86,7 +86,7 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PackageUom)
-            </th>
+            </th> *@
             <th></th>
         </tr>
     </thead>
@@ -103,41 +103,41 @@
                 @Html.DisplayFor(modelItem => item.NdcPattern)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Company.Id)
+                @Html.DisplayFor(modelItem => item.Company.Name)
             </td>
-            <td>
+            @* <td>
                 @Html.DisplayFor(modelItem => item.AdditionalId)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.AdditionalIdTypeCode)
-            </td>
+            </td> *@
             <td>
                 @Html.DisplayFor(modelItem => item.DescriptionShort)
             </td>
-            <td>
+            @* <td>
                 @Html.DisplayFor(modelItem => item.DosageFormType)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.FunctionalName)
-            </td>
+            </td> *@
             <td>
                 @Html.DisplayFor(modelItem => item.ManufacturerName)
             </td>
-            <td>
+            @* <td>
                 @Html.DisplayFor(modelItem => item.NetContentDescription)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.LabelDescription)
-            </td>
+            </td> *@
             <td>
                 @Html.DisplayFor(modelItem => item.RegulatedProductName)
             </td>
-            <td>
+                @* <td>
                 @Html.DisplayFor(modelItem => item.StrengthDescription)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.TradeItemDescription)
-            </td>
+            </td> *@
             <td>
                 @Html.DisplayFor(modelItem => item.SerialNumberLength)
             </td>
@@ -147,7 +147,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.CountryOfOrigin)
             </td>
-            <td>
+            @* <td>
                 @Html.DisplayFor(modelItem => item.DrainedWeight)
             </td>
             <td>
@@ -167,7 +167,7 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PackageUom)
-            </td>
+            </td> *@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
