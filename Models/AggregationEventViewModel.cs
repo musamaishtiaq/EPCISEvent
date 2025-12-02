@@ -7,12 +7,12 @@ using Action = EPCISEvent.Fastnt.Action;
 
 namespace EPCISEvent.Models
 {
-    public class ObjectEventViewModel
+    public class AggregationEventViewModel
     {
         public int Id { get; set; }
         [Required]
         [Display(Name = "Event Type")]
-        public EventType EventType { get; set; } = EventType.ObjectEvent;
+        public EventType EventType { get; set; } = EventType.AggregationEvent;
 
         [Required]
         [Display(Name = "Event Time")]
@@ -47,23 +47,19 @@ namespace EPCISEvent.Models
         public List<Source2> SourceList { get; set; } = new List<Source2>();
         public List<Destination2> DestinationList { get; set; } = new List<Destination2>();
         public List<string> EpcList { get; set; } = new List<string>();
-        public List<QuantityElement> QuantityList { get; set; } = new List<QuantityElement>();
-        public List<Fastnt.InstanceLotMasterDataAttribute> Ilmd { get; set; } = new List<Fastnt.InstanceLotMasterDataAttribute>();
-
+        
         // Properties for adding new items
         [Display(Name = "New EPC")]
         public string NewEpc { get; set; }
+
+        // Properties for adding parent items
+        [Display(Name = "Parent EPC")]
+        public string ParentEpc { get; set; }
 
         [Display(Name = "New Business Transaction")]
         public string NewBizTransaction { get; set; }
 
         [Display(Name = "Transaction Type")]
         public string NewBizTransactionType { get; set; }
-
-        [Display(Name = "New ILMD Attribute")]
-        public string NewIlmdAttribute { get; set; }
-
-        [Display(Name = "New ILMD Value")]
-        public string NewIlmdValue { get; set; }
     }
 }

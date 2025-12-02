@@ -1,15 +1,15 @@
-﻿@model EPCISEvent.Models.ObjectEventViewModel
+﻿@model EPCISEvent.Models.AggregationEventViewModel
 
 @{
-    ViewData["Title"] = "Create Object Event";
+    ViewData["Title"] = "Create Aggregation Event";
 }
 
-<h1>Create Object Event</h1>
+<h1>Create Aggregation Event</h1>
 
-<h4>Object Event</h4>
+<h4>Aggregation Event</h4>
 <hr />
 
-<form asp-action="EditObjectEvent" method="post">
+<form asp-action="EditAggregationEvent" method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <input type="hidden" asp-for="Id" />
@@ -105,13 +105,15 @@
     <!-- EPC List Section -->
     <div class="card mt-4">
         <div class="card-header">
-            <h5>EPC List</h5>
+            <h5>Child EPC List</h5>
         </div>
         <div class="card-body">
             <div class="form-group">
-                <label for="NewEpc" class="control-label">Add EPC</label>
+                <label for="ParentEpc" class="control-label">Add Parent EPC</label>
+                <input name="ParentEpc" class="form-control" id="ParentEpc" />
+                <label for="NewEpc" class="control-label">Add Child EPC</label>
                 <input name="NewEpc" class="form-control" />
-                <button type="button" class="btn btn-secondary mt-2" onclick="addEpc()">Add EPC</button>
+                <button type="button" class="btn btn-secondary mt-2" onclick="addEpc()">Add Child EPC</button>
             </div>
 
             <div id="epcList">
@@ -176,50 +178,6 @@
         </div>
     }
 
-    @if (Model.BizStep != EPCISEvent.Fastnt.CBV.BusinessSteps.Shipping
-                        && Model.BizStep != EPCISEvent.Fastnt.CBV.BusinessSteps.Receiving)
-    {
-        <!-- ILMD Section -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5>Instance/Lot Master Data (ILMD)</h5>
-            </div>
-
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-5">
-                        <label class="control-label">ILMD Attribute</label>
-                        <select name="NewIlmdAttribute" class="form-control" asp-items="@EPCISEvent.Controllers.EventDatasController.GetIlmdAttributeSelectList()">
-                            <option value="">-- Select Attribute --</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-5">
-                        <label class="control-label">ILMD Value</label>
-                        <input name="NewIlmdValue" class="form-control" />
-                    </div>
-
-                    <div class="col-md-2">
-                        <label>&nbsp;</label>
-                        <button type="button" class="btn btn-secondary btn-block" onclick="addIlmd()">Add</button>
-                    </div>
-                </div>
-
-                <div id="ilmdList" class="mt-3">
-                    @for (int i = 0; i < Model.Ilmd.Count; i++)
-                    {
-                        <div class="ilmd-item">
-                            <input type="hidden" name="Ilmd[@i].AttributeId" value="@Model.Ilmd[i].Name" />
-                            <input type="hidden" name="Ilmd[@i].Value" value="@Model.Ilmd[i].Value" />
-                            <span>@Model.Ilmd[i].Name : @Model.Ilmd[i].Value</span>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="removeIlmd(this)">Remove</button>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    }
-
     <div class="form-group mt-4">
         <input type="submit" value="Create" class="btn btn-primary" />
         <a asp-action="Index" class="btn btn-secondary">Back to List</a>
@@ -230,8 +188,50 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const parentInput = document.getElementById("ParentEpc");
+
+            parentInput.addEventListener("input", function () {
+                checkAndConvertParentEpc();
+            });
+
+            function checkAndConvertParentEpc() {
+                let raw = parentInput.value.trim();
+
+                if (!raw) return;
+
+                // Check if input matches required start
+                const valid =
+                    (!raw.startsWith("]d200") && raw.length === 18) ||
+                    (raw.startsWith("]d200") && raw.length === 23);
+                if (valid) {
+
+                    console.log("Matched EPC prefix, converting...");
+
+                    fetch('/EventDatas/ConvertEpc', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(raw)
+                    })
+                    .then(response => response.json())
+                    .then(converted => {
+
+                        if (!converted) return;
+
+                        // Update the input field value
+                        parentInput.value = converted;
+
+                        console.log("Parent EPC converted:", converted);
+                    })
+                    .catch(err => console.error("Conversion failed:", err));
+                }
+            }
+        });
+
         $(document).ready(function() {
             // Company change event for both business and destination sections
             $('.company-select').change(function() {
@@ -368,39 +368,6 @@
         }
 
         function removeBizTransaction(button) {
-            button.parentElement.remove();
-        }
-
-        let ilmdIndex = @Model.Ilmd.Count;
-
-        function addIlmd() {
-            const attrSelect = document.querySelector('select[name="NewIlmdAttribute"]');
-            const valueInput = document.querySelector('input[name="NewIlmdValue"]');
-
-            const attributeId = attrSelect.value;
-            const attributeText = attrSelect.options[attrSelect.selectedIndex].text;
-            const value = valueInput.value.trim();
-
-            if (!attributeId || !value) return;
-
-            const div = document.createElement('div');
-            div.className = 'ilmd-item';
-            div.innerHTML = `
-                <input type="hidden" name="Ilmd[${ilmdIndex}].Name" value="${attributeId}" />
-                <input type="hidden" name="Ilmd[${ilmdIndex}].Value" value="${value}" />
-                <span>${attributeText}: ${value}</span>
-                <button type="button" class="btn btn-sm btn-danger" onclick="removeIlmd(this)">Remove</button>
-            `;
-
-            document.getElementById('ilmdList').appendChild(div);
-
-            attrSelect.selectedIndex = 0;
-            valueInput.value = '';
-
-            ilmdIndex++;
-        }
-
-        function removeIlmd(button) {
             button.parentElement.remove();
         }
     </script>

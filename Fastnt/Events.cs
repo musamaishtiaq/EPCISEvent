@@ -21,6 +21,19 @@ namespace EPCISEvent.Fastnt
         TransformationEvent
     }
 
+    public enum BusinessEventType
+    {
+        Commissioning,
+        Packing,
+        Shipping,
+        Receiving,
+        Unpacking,
+        VoidShipping,
+        Inspection,
+        Decommissioning,
+        Dispensing
+    }
+
     /// <summary>
     /// The Action type says how an event relates to the lifecycle of the entity
     /// being described. See section 7.3.2 of the EPCIS 1.2 standard.
@@ -35,6 +48,30 @@ namespace EPCISEvent.Fastnt
 
         [EnumMember(Value = "DELETE")]
         Delete
+    }
+
+    public enum IlmdAttribute
+    {
+        [EnumMember(Value = "example:lotNumber")]
+        LotNumber,
+
+        [EnumMember(Value = "example:expiryDate")]
+        ExpiryDate,
+
+        [EnumMember(Value = "example:reason")]
+        Reason,
+
+        [EnumMember(Value = "example:method")]
+        Method,
+
+        [EnumMember(Value = "example:inspectionResult")]
+        InspectionResult,
+
+        [EnumMember(Value = "example:temperature")]
+        Temperature,
+
+        [EnumMember(Value = "example:dispensedBy")]
+        DispensedBy
     }
 
     /// <summary>
@@ -66,6 +103,10 @@ namespace EPCISEvent.Fastnt
     {
         public string Name { get; set; }
         public string Value { get; set; }
+
+        public InstanceLotMasterDataAttribute()
+        {
+        }
 
         public InstanceLotMasterDataAttribute(string name, string value)
         {
@@ -268,7 +309,7 @@ namespace EPCISEvent.Fastnt
         public List<QuantityElement> QuantityList { get; set; }
 
         [JsonPropertyName("ilmd")]
-        public List<InstanceLotMasterDataAttribute> Ilmd { get; set; }
+        public Dictionary<string, string> Ilmd { get; set; }
 
         [JsonPropertyName("action")]
         public string Action { get; set; }

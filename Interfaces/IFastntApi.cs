@@ -24,7 +24,7 @@ namespace EPCISEvent.Interfaces
 
         [Post("/Capture")]
         [Headers("Content-Type: application/json", "Accept: application/json")]
-        Task<Result<CaptureResponse>> CaptureJsonEvent([Body] object jsonEvent);
+        Task CaptureJsonEvent([Body] object jsonEvent);
 
         [Post("/events")]
         [Headers("Content-Type: application/json")]

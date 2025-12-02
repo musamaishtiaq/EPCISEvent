@@ -140,7 +140,7 @@ namespace EPCISEvent.Fastnt
 
         public static string Gln13ToSglnUrn(string gln)
         {
-            if (gln.Length != 15)
+            if (gln.Length != 15 && gln.Length != 13)
             {
                 throw new ArgumentException(
                     "The company prefix and location reference variables " +

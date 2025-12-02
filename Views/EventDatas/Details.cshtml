@@ -1,4 +1,23 @@
-﻿@model EPCISEvent.MasterData.MainClasses.EventData
+﻿@using Newtonsoft.Json
+@model EPCISEvent.MasterData.MainClasses.EventData
+@functions {
+    public string FormatJson(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+            return json;
+
+        try
+        {
+            var parsed = JsonConvert.DeserializeObject(json);
+            return JsonConvert.SerializeObject(parsed, Formatting.Indented);
+        }
+        catch
+        {
+            // If it's invalid JSON, return as-is
+            return json;
+        }
+    }
+}
 
 @{
     ViewData["Title"] = "Details";
@@ -16,17 +35,17 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.EventType)
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedAt)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedAt)
+        </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.EventLog)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EventLog)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
+            <pre style="background:#f5f5f5; padding:10px; border-radius:5px;">@Html.Raw(FormatJson(Model.EventLog))</pre>
         </dd>
     </dl>
 </div>

@@ -1,6 +1,7 @@
 using EPCISEvent.Interfaces;
 using EPCISEvent.MasterData;
 using EPCISEvent.Services;
+using EPCISEvent.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Refit;
 using System;
+using System.Configuration;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,10 +25,18 @@ builder.Services.AddDbContext<MasterDataContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddScoped<MasterDataSeeder>();
 
-string fastntBaseUrl = builder.Configuration.GetValue<string>("FastntBaseUrl");
+FastntSettings fastntSettings = builder.Configuration.GetSection(nameof(FastntSettings)).Get<FastntSettings>();
 builder.Services
     .AddRefitClient<IFastntApi>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri(fastntBaseUrl));
+    .ConfigureHttpClient(c =>
+    {
+        c.BaseAddress = new Uri(fastntSettings.BaseUrl);
+        var credentials = Encoding.ASCII.GetBytes($"{fastntSettings.Username}:{fastntSettings.Password}");
+        var base64 = Convert.ToBase64String(credentials);
+
+        c.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Basic", base64);
+    });
 
 builder.Services.AddControllersWithViews();
 
